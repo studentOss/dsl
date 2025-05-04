@@ -31,7 +31,7 @@ public:
 
     bstnode* get_root() {
         return root;
-    } // Helper function to access root
+    } 
 };
 
 bstnode* bst::create() {
