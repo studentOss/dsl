@@ -15,27 +15,27 @@ flight::flight()
     int i, j;
     for(i = 0; i < 10; i++)
     {
-        strcpy(city_index[i], "xx"); // Initialize city names to "xx"
+        strcpy(city_index[i], "xx"); 
     }
     for(i = 0; i < 10; i++)
     {
         for(j = 0; j < 10; j++)
         {
-            am[i][j] = 0; // Initialize adjacency matrix to 0
+            am[i][j] = 0; 
         }
     }
 }
 int flight::create()
 {
-    int city_count = 0, j, si, di, wt; // si, di store index of source and destination
-    char s[10], d[10], c; // stores names of city
+    int city_count = 0, j, si, di, wt; 
+    char s[10], d[10], c; 
     do
     {
         cout << "\n\tEnter Source City : ";
         cin >> s;
         cout << "\n\tEnter Destination City : ";
         cin >> d;
-        // Finding Source City already exist
+    
         si = -1;
         for (j = 0; j < city_count; j++)
         {
@@ -46,14 +46,13 @@ int flight::create()
             }
         }
 
-        if (si == -1) //city not found increase city index and city count
+        if (si == -1)
         {
             strcpy(city_index[city_count], s);
             si = city_count;
             city_count++;
         }
 
-        // Finding Destination City
         di = -1;
         for (j = 0; j < city_count; j++)
         {
@@ -84,22 +83,20 @@ int flight::create()
 void flight::display(int city_count)
 {
     cout << "\n\tDisplaying Adjacency Matrix:\n\t";
-    // Step 1: Print column headers
-    cout << " "; //space for top left corner
+    cout << " "; 
     for (int i = 0; i < city_count; i++)
     {
-        cout << city_index[i] << "\t"; // a b c d
+        cout << city_index[i] << "\t";
     }
     cout << "\n";
 
-    // Step 2: Display rows with city names and corresponding distances
     for (int i = 0; i < city_count; i++)
     {
-        cout << city_index[i] << "\t"; // Display row headers (city names) // a
+        cout << city_index[i] << "\t"; 
         for (int j = 0; j < city_count; j++)
         {
-            cout << am[i][j] << "\t"; // Display matrix values // 0 10 0 5
-        } // a 0 10 0 5
+            cout << am[i][j] << "\t"; 
+        } 
         cout << "\n";
     }
 }
