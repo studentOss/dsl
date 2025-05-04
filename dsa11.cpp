@@ -1,12 +1,14 @@
 #include <iostream>
 #include <fstream>
+#include <cstring>  // For strcpy and getline
 using namespace std;
 
 class Record {
     int rollno;
-    string name;
+    char name[50];       // Fixed-size char array
     int division;
-    string address;
+    char address[100];   // Fixed-size char array
+
 public:
     Record();
     int getRollno();
@@ -16,42 +18,44 @@ public:
 
 Record::Record() {
     rollno = 0;
-    name = ' ';
-    address = ' ';
+    strcpy(name, "");
     division = 0;
+    strcpy(address, "");
 }
 
 int Record::getRollno() {
-    return (rollno);
+    return rollno;
 }
 
 void Record::getData() {
-    cout << "\nEnter Details: ";
-    cout << "\nRoll no: ";
+    cout << "\nEnter Details:";
+    cout << "\nRoll No: ";
     cin >> rollno;
+    cin.ignore();
+
     cout << "Name: ";
-    cin >> name;
+    cin.getline(name, 50);
+
     cout << "Division Code: ";
     cin >> division;
+    cin.ignore();
+
     cout << "Address: ";
-    cin >> address;
+    cin.getline(address, 100);
 }
 
 void Record::putData() {
-    cout << "\nRoll No.: ";
-    cout << rollno;
-    cout << "\t\tName: ";
-    cout << name;
-    cout << "\nDivision Code: ";
-    cout << division;
-    cout << "\tAddress: ";
-    cout << address;
+    cout << "\nRoll No.: " << rollno;
+    cout << "\tName: " << name;
+    cout << "\nDivision Code: " << division;
+    cout << "\tAddress: " << address << "\n";
 }
 
 class File {
     ifstream fin;
     ofstream fout;
     fstream fs;
+
 public:
     void insert();
     void display();
@@ -63,142 +67,138 @@ public:
 void File::insert() {
     Record r;
     r.getData();
-    fout.open("StudentDB", ios::ate | ios::app);
-    fout.write((char *)&r, sizeof(r));
+    fout.open("StudentDB", ios::binary | ios::app);
+    fout.write((char*)&r, sizeof(r));
     fout.close();
 }
 
 void File::display() {
     Record r;
-    fin.open("StudentDB");
+    fin.open("StudentDB", ios::binary);
     fin.seekg(0, ios::beg);
-    while (fin.read((char *)&r, sizeof(r)))
+    while (fin.read((char*)&r, sizeof(r))) {
         r.putData();
+    }
     fin.close();
 }
 
 void File::search(int rollno) {
     Record r;
-    int flag = 0;
-    fin.open("StudentDB");
-    fin.seekg(0, ios::beg);
-    while (fin.read((char *)&r, sizeof(r))) {
+    int found = 0;
+    fin.open("StudentDB", ios::binary);
+    while (fin.read((char*)&r, sizeof(r))) {
         if (r.getRollno() == rollno) {
-            flag = 1;
+            cout << "\nRecord Found:";
+            r.putData();
+            found = 1;
             break;
         }
     }
     fin.close();
-    if (flag == 1) {
-        cout << "\nRecord Found:";
-        r.putData();
-    }
-    else
-        cout << "\nRecord not Found ";
+    if (!found)
+        cout << "\nRecord not found.";
 }
 
 int File::Delete(int rollno) {
     Record r;
-    int flag = 0;
-    fin.open("StudentDB");
-    fout.open("Temp", ios::ate | ios::app);
-    fin.seekg(0, ios::beg);
-    while (fin.read((char *)&r, sizeof(r))) {
+    int found = 0;
+    fin.open("StudentDB", ios::binary);
+    fout.open("Temp", ios::binary);
+    while (fin.read((char*)&r, sizeof(r))) {
         if (r.getRollno() == rollno) {
-            flag = 1;
-        }
-        else {
-            fout.write((char *)&r, sizeof(r));
+            found = 1;
+        } else {
+            fout.write((char*)&r, sizeof(r));
         }
     }
     fin.close();
     fout.close();
     remove("StudentDB");
     rename("Temp", "StudentDB");
-    return (flag);
+    return found;
 }
 
 int File::edit(int rollno) {
     Record r;
-    int flag = 0;
-    fs.open("StudentDB");
-    fs.seekg(0, ios::beg);
-    while (fs.read((char *)&r, sizeof(r))) {
+    int found = 0;
+    fs.open("StudentDB", ios::binary | ios::in | ios::out);
+    while (fs.read((char*)&r, sizeof(r))) {
         if (r.getRollno() == rollno) {
-            flag = 1;
-            cout << "\nEnter New Details: ";
+            cout << "\nEnter New Details:";
             r.getData();
-            fs.seekp((int)fs.tellg() - sizeof(r), ios::beg);
-            fs.write((char *)&r, sizeof(r));
+            fs.seekp((int)fs.tellg() - sizeof(r));
+            fs.write((char*)&r, sizeof(r));
+            found = 1;
+            break;
         }
     }
     fs.close();
-    return (flag);
+    return found;
 }
 
 int main() {
     File f;
-    int ch, n, i, flag = 0;
-    do {
-        cout << "\n\n\t-----M E N U-----";
-        cout << "\n\n1. Build A Master Table";
-        cout << "\n2. List A Table";
-        cout << "\n3. Insert a New Entry";
-        cout << "\n4. Delete Old Entry";
-        cout << "\n5. Edit an Entry";
-        cout << "\n6. Search for a Record";
-        cout << "\n7. Quit";
-        cout << "\nEnter your Choice: ";
-        cin >> ch;
-        switch (ch) {
-            case 1:
-                if (flag == 0) {
-                    cout << "\nEnter No of Records to insert : ";
-                    cin >> n;
-                    for (i = 0; i < n; i++) {
-                        f.insert();
-                    }
-                    flag = 1;
-                }
-                else {
-                    cout << "\nSorry.. Table is Already build... \n If want to add record please select Insert a New Entry in option.....";
-                }
-                break;
-            case 2:
-                f.display();
-                break;
-            case 3:
-                f.insert();
-                break;
-            case 4:
-                cout << "\nEnter Roll No of Student Whose Record is to be Deleted: ";
-                cin >> n;
-                i = f.Delete(n);
-                if (i == 1)
-                    cout << "\nRecord Deleted Successfully";
-                else
-                    cout << "\nRecord not Found";
-                break;
-            case 5:
-                cout << "\nEnter Roll No of Student Whose Record is to be Edit: ";
-                cin >> n;
-                i = f.edit(n);
-                if (i == 1)
-                    cout << "\nRecord Modified Successfully";
-                else
-                    cout << "\nRecord not Found";
-                break;
-            case 6:
-                cout << "\nEnter Roll No of Student Whose Record is to be Searched: ";
-                cin >> n;
-                f.search(n);
-                break;
-            case 7:
-                break;
-            default:
-                cout << "\nEnter Valid Choice.....";
-        }
-    } while (ch != 7);
-    return (0);
-}
+    int choice, n, flag = 0;
 
+    do {
+        cout << "\n\n\t----- MENU -----";
+        cout << "\n1. Build Master Table";
+        cout << "\n2. Display Records";
+        cout << "\n3. Insert New Record";
+        cout << "\n4. Delete Record";
+        cout << "\n5. Edit Record";
+        cout << "\n6. Search Record";
+        cout << "\n7. Quit";
+        cout << "\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            if (!flag) {
+                cout << "\nEnter number of records to insert: ";
+                cin >> n;
+                for (int i = 0; i < n; ++i) {
+                    f.insert();
+                }
+                flag = 1;
+            } else {
+                cout << "\nTable already built. Use option 3 to insert new records.";
+            }
+            break;
+        case 2:
+            f.display();
+            break;
+        case 3:
+            f.insert();
+            break;
+        case 4:
+            cout << "\nEnter Roll No to delete: ";
+            cin >> n;
+            if (f.Delete(n))
+                cout << "\nRecord deleted successfully.";
+            else
+                cout << "\nRecord not found.";
+            break;
+        case 5:
+            cout << "\nEnter Roll No to edit: ";
+            cin >> n;
+            if (f.edit(n))
+                cout << "\nRecord updated successfully.";
+            else
+                cout << "\nRecord not found.";
+            break;
+        case 6:
+            cout << "\nEnter Roll No to search: ";
+            cin >> n;
+            f.search(n);
+            break;
+        case 7:
+            cout << "\nExiting...";
+            break;
+        default:
+            cout << "\nInvalid choice.";
+        }
+    } while (choice != 7);
+
+    return 0;
+}
