@@ -16,53 +16,52 @@ public:
 };
 class ExpressionTree
 {
-    BTNODE * root; // Pointer to the root of the tree
+    BTNODE * root; 
 
 public:
     ExpressionTree()
     {
-        root = NULL; // Initialize root to NULL
+        root = NULL; 
     }
 
-    void create(string); // Creates the expression tree
-    void Inorder(BTNODE *); // Inorder traversal
-    void Preorder(BTNODE *); // Preorder traversal
-    void Postorder(BTNODE *); // Postorder traversal
-    void Delete_tree(BTNODE *); // Deletes the tree
-    friend int main(); // `main()` accesses private members
+    void create(string);
+    void Inorder(BTNODE *); 
+    void Preorder(BTNODE *); 
+    void Postorder(BTNODE *); 
+    void Delete_tree(BTNODE *); 
+    friend int main(); 
 };
 void ExpressionTree::create(string s)
 {
-    stack<BTNODE *> s1; // Stack to hold nodes while constructing the tree
-    BTNODE *T1, *T2, *T3; // Temporary pointers
+    stack<BTNODE *> s1; 
+    BTNODE *T1, *T2, *T3;
     int i;
 
-    // Traverse the string from right to left (Prefix Rule)
+    
     for (i = s.length() - 1; i >= 0; i--)
     {
-        if (isalnum(s[i])) // Check if it's an operand (e.g., a, b, c, etc.)
+        if (isalnum(s[i])) 
         {
             T1 = new BTNODE;
-            T1->data = s[i]; // Assign data to the node
+            T1->data = s[i]; 
 
-            s1.push(T1); // Push operand node onto stack
+            s1.push(T1); 
         }
-        else // If operator (+, -, *, /)
+        else 
         {
-            T3 = s1.top(); s1.pop(); // Pop top node
-            T2 = s1.top(); s1.pop(); // Pop next node
+            T3 = s1.top(); s1.pop();
+            T2 = s1.top(); s1.pop(); 
 
             T1 = new BTNODE;
-            T1->data = s[i]; // Assign operator to the node
-            T1->left = T3; // Attach as left child
-            T1->right = T2; // Attach as right child
-
-            s1.push(T1); // Push the newly formed subtree
+            T1->data = s[i]; 
+            T1->left = T3; 
+            T1->right = T2; 
+            s1.push(T1); 
         }
     }
 
-    root = s1.top(); // Final node is the root
-    s1.pop(); // Clear the remaining element from the stack
+    root = s1.top(); 
+    s1.pop(); 
 }
 
 void ExpressionTree::Inorder(BTNODE *T)
@@ -88,7 +87,6 @@ void ExpressionTree::Postorder(BTNODE *T) {
     if (T == NULL) return;
     stack<BTNODE*> S1, S2;
     S1.push(T);
-    // Step 1: Process nodes and push into S2 in reverse postorder
     while (!S1.empty())
     {
         T = S1.top();
@@ -96,11 +94,11 @@ void ExpressionTree::Postorder(BTNODE *T) {
         S2.push(T);
 
         if (T->left != NULL)
-            S1.push(T->left); // Push left child first
+            S1.push(T->left); 
         if (T->right != NULL)
-            S1.push(T->right); // Push right child second
+            S1.push(T->right); 
     }
-    // Step 2: Pop from S2 to get correct postorder traversal
+    
     while (!S2.empty()) {
         cout << " " << S2.top()->data;
         S2.pop();
