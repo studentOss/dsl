@@ -1,13 +1,12 @@
 #include <iostream>
 #include <fstream>
-#include <cstring>  // For strcpy and getline
+#include <cstring>  
 using namespace std;
 
 class Record {
     int rollno;
-    char name[50];       // Fixed-size char array
-    int division;
-    char address[100];   // Fixed-size char array
+    char name[50];       
+    char address[100];   
 
 public:
     Record();
