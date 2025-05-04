@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
-#include <map> // ADD THIS FOR INDEX
+#include <map> 
 using namespace std;
 
 class Record {
@@ -55,14 +55,14 @@ class File {
     ifstream fin;
     ofstream fout;
     fstream fs;
-    map<int, streampos> index; // INDEX MAP
+    map<int, streampos> index; 
 public:
     void insert();
     void display();
     void search(int);
     int Delete(int);
     int edit(int);
-    void buildIndex(); // BUILD INDEX FUNCTION
+    void buildIndex(); 
 };
 void File::buildIndex() {
     index.clear();
